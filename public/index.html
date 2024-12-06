@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project for Realtime-Innovations</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    button {
+      border: none;
+      border-radius: 50px;
+      padding: 20px;
+      margin: 10px;
+      cursor: pointer;
+      color: white;
+      font-size: 16px;
+    }
+    .red { background-color: red; }
+    .blue { background-color: blue; }
+  </style>
+</head>
+<body>
+  <h1>Project for Realtime-Innovations</h1>
+  <button class="blue" onclick="clickButton('blue')">Blue Button</button>
+  <button class="red" onclick="clickButton('red')">Red Button</button>
+  <p id="message"></p>
+  <script>
+    async function clickButton(color) {
+      try {
+        const response = await fetch(`/click/${color}`, { method: 'POST' });
+        const data = await response.json();
+        document.getElementById("message").textContent = data.message || '';
+      } catch (err) {
+        document.getElementById("message").textContent = err.response?.data?.error || 'An error occurred!';
+      }
+    }
+  </script>
+</body>
+</html>
