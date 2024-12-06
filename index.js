@@ -1,83 +1,95 @@
-const express = require("express");
-const rateLimit = require("express-rate-limit");
-const Redis = require("ioredis");
-const bodyParser = require("body-parser");
-const { PubSub } = require("@google-cloud/pubsub");
-require("dotenv").config(); // For loading environment variables
+const express = require('express');
+const firebaseAdmin = require('firebase-admin');
+const { PubSub } = require('@google-cloud/pubsub');
+const rateLimit = require('express-rate-limit');
 
+// Initialize Firebase Admin SDK
+firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.applicationDefault(),
+});
+
+const db = firebaseAdmin.firestore();
+const pubsub = new PubSub();
 const app = express();
+const port = process.env.PORT || 8080;
 
-// Use environment variables for Redis and Google Cloud credentials
-const redis = new Redis({
-  host: process.env.REDIS_HOST || 'localhost', // Redis host
-  port: process.env.REDIS_PORT || 6379, // Redis port (default: 6379)
-  password: process.env.REDIS_PASSWORD || '', // Optional: Password for Redis
-});
-
-const pubsub = new PubSub({
-  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID, // Google Cloud Project ID
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // Path to service account key file
-});
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const rateLimits = {
-  blue: rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 10,
-    handler: (req, res) => handleLimitExceeded(req, res, "blue"),
-  }),
-  red: rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 10,
-    handler: (req, res) => handleLimitExceeded(req, res, "red"),
-  }),
+// In-memory rate limiter for each button (can be replaced with Redis)
+const rateLimitMemory = {
+    blue: { count: 0, timestamp: Date.now() },
+    red: { count: 0, timestamp: Date.now() },
 };
 
-app.use(express.static("public"));
-
-// Log button clicks in Redis
-async function logClick(button, ip) {
-  const timestamp = new Date().toISOString();
-  try {
-    await redis.lpush("clicks", JSON.stringify({ button, timestamp, ip }));
-  } catch (err) {
-    console.error("Error logging click to Redis:", err);
-  }
-}
-
-// Handle rate limit exceeded and publish event to Pub/Sub
-async function handleLimitExceeded(req, res, button) {
-  const ip = req.ip;
-  const timestamp = new Date().toISOString();
-  
-  // Publish to Google Cloud Pub/Sub
-  try {
-    const message = {
-      json: { button, timestamp, ip },
-    };
-    await pubsub.topic("button-click-limits").publishMessage(message);
-  } catch (err) {
-    console.error("Error publishing to Pub/Sub:", err);
-  }
-
-  res.status(429).json({ error: "Rate limit exceeded", button, ip });
-}
-
-// Button click routes
-app.post("/click/blue", rateLimits.blue, async (req, res) => {
-  await logClick("blue", req.ip);
-  res.json({ message: "Blue button clicked!" });
+// Rate limit configuration
+const limiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // Limit each button click to 10 per minute
+    message: 'Rate limit exceeded. Try again later.',
 });
 
-app.post("/click/red", rateLimits.red, async (req, res) => {
-  await logClick("red", req.ip);
-  res.json({ message: "Red button clicked!" });
+app.use(limiter);
+
+// Route for clicking a button (blue/red)
+app.post('/click/:buttonColor', async (req, res) => {
+    const buttonColor = req.params.buttonColor;
+    const userIP = req.ip;
+    const timestamp = new Date().toISOString();
+
+    // Rate-limiting logic (using in-memory here for simplicity)
+    const currentTime = Date.now();
+    const limit = 10;
+
+    if (rateLimitMemory[buttonColor]) {
+        const lastClickTime = rateLimitMemory[buttonColor].timestamp;
+        const timeDifference = currentTime - lastClickTime;
+
+        if (timeDifference < 60 * 1000) {
+            // Rate limit exceeded, send notification via Pub/Sub
+            if (rateLimitMemory[buttonColor].count >= limit) {
+                const message = {
+                    buttonColor,
+                    timestamp,
+                    userIP,
+                };
+
+                await publishRateLimitExceededMessage(message);
+                return res.status(429).send('Rate limit exceeded for this button');
+            }
+        } else {
+            // Reset the count if it's more than a minute ago
+            rateLimitMemory[buttonColor].count = 0;
+            rateLimitMemory[buttonColor].timestamp = currentTime;
+        }
+
+        // Log the click in Firestore
+        try {
+            await db.collection('buttonClicks').add({
+                buttonColor,
+                timestamp,
+                userIP,
+            });
+            rateLimitMemory[buttonColor].count += 1; // Increment the click count
+            res.status(200).send('Click logged successfully');
+        } catch (error) {
+            res.status(500).send('Error logging click: ' + error.message);
+        }
+    } else {
+        return res.status(400).send('Invalid button color');
+    }
 });
 
-// Start the server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Publish a message to Google Cloud Pub/Sub when rate limit is exceeded
+async function publishRateLimitExceededMessage(message) {
+    const topicName = 'rate-limit-notifications'; // The name of your Pub/Sub topic
+    const dataBuffer = Buffer.from(JSON.stringify(message));
+
+    try {
+        await pubsub.topic(topicName).publish(dataBuffer);
+        console.log('Published message to Pub/Sub:', message);
+    } catch (error) {
+        console.error('Error publishing to Pub/Sub:', error);
+    }
+}
+
+app.listen(port, () => {
+    console.log(`App is running on port ${port}`);
 });
