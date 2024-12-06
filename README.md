@@ -44,7 +44,3 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
 
    - After deployment, **Pulumi** will output the URL of your Cloud Run app. You can access it in your browser.
 
-
-## Running Locally
-
-1. **Clone the repo**:
