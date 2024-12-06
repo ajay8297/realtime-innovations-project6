@@ -9,7 +9,7 @@ const service = new gcp.cloudrun.Service("express-app", {
   template: {
     spec: {
       containers: [{
-        image: "gcr.io/<YOUR_PROJECT_ID>/express-app:latest",
+        image: "gcr.io/final-project-443911/express-app:latest",
       }],
     },
   },
