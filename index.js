@@ -3,20 +3,19 @@ const rateLimit = require("express-rate-limit");
 const Redis = require("ioredis");
 const bodyParser = require("body-parser");
 const { PubSub } = require("@google-cloud/pubsub");
-require("dotenv").config(); // For loading environment variables
+require("dotenv").config(); 
 
 const app = express();
 
-// Use environment variables for Redis and Google Cloud credentials
 const redis = new Redis({
-  host: process.env.REDIS_HOST || 'localhost', // Redis host
-  port: process.env.REDIS_PORT || 6379, // Redis port (default: 6379)
-  password: process.env.REDIS_PASSWORD || '', // Optional: Password for Redis
+  host: process.env.REDIS_HOST || 'localhost', 
+  port: process.env.REDIS_PORT || 6379, 
+  password: process.env.REDIS_PASSWORD || '', 
 });
 
 const pubsub = new PubSub({
-  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID, // Google Cloud Project ID
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // Path to service account key file
+  projectId: process.env.final-project-443911, 
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, 
 });
 
 app.use(bodyParser.json());
