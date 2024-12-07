@@ -44,3 +44,5 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
 
    - After deployment, **Pulumi** will output the URL of your Cloud Run app. You can access it in your browser.
 
+   - https://realtime-innovations-project6-57338077025.us-central1.run.app/
+
