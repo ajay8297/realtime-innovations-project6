@@ -6,6 +6,42 @@
 
 This project is an **Express.js** web application deployed on **Google Cloud Run**. It includes two buttons (Blue and Red), each with a rate limit of 10 clicks per minute. If the user exceeds the limit, an error message is displayed. The project also uses **Google Cloud Pub/Sub** for notifications, and **Pulumi** for infrastructure management. The app is containerized using **Docker** and deployed via **CI/CD** on **Google Cloud Run**.
 
+## Features
+
+- **Cloud Platform**: Built on **Google Cloud Platform (GCP)** and **Firebase** for scalable and secure deployments.
+- **Authentication & Authorization**: Utilizes **IAM** roles for managing access and permissions.
+- **Monitoring & Alerting**: Integrated with GCP's logging and monitoring tools for observability.
+- **Node.js & TypeScript**: Developed with **Node.js**, **Express**, and **TypeScript** for type safety and robust API development.
+- **API Versioning**: Implements versioning strategies for **RESTful APIs** to ensure backward compatibility.
+- **CI/CD Pipelines**: Automated pipelines using Pulumi and GitHub Actions to streamline deployments.
+- **Infrastructure as Code**: Utilizes **Pulumi** for resource management, including:
+  - Dockerized container builds and scaling.
+  - Cloud Run for serverless container orchestration.
+  - Pub/Sub for messaging services.
+- **Database Support**: Configured for databases like **Postgres**, **Datastore**, and **MongoDB**.
+
+## Technology Stack
+
+| **Category**         | **Technologies**                                                             |
+|-----------------------|-----------------------------------------------------------------------------|
+| Cloud Platform        | GCP (Cloud Run, Pub/Sub, Logging, Monitoring, IAM)                          |
+| Backend Framework     | Node.js, Express                                                           |
+| Language              | TypeScript                                                                 |
+| Infrastructure as Code| Pulumi (with Docker and GCP providers)                                      |
+| Containerization      | Docker,
+| Databases             | Postgres, Datastore, MongoDB                                               |                                 |
+| CI/CD Pipelines       | GitHub Actions, Pulumi automation                                          |
+
+## Prerequisites
+
+1. **Node.js** and **npm** installed on your system.
+2. **Pulumi CLI** installed and configured.
+3. Docker installed for building and deploying containers.
+4. Access to a Google Cloud Project with permissions for Cloud Run, Pub/Sub, and IAM.
+5. Firebase.
+
+## Getting Started
+
 ## Tech Stack
 
 - **Express.js**: Web framework for Node.js
@@ -28,8 +64,7 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
      ```
 
 2. **Pulumi Setup for Deployment**:  
-   - **Install Pulumi CLI** (if not installed):  
-     [Download and install Pulumi](https://www.pulumi.com/docs/get-started/install/).
+   - **Install Pulumi CLI**  
 
    - **Login to Pulumi**:  
      ```bash
