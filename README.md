@@ -20,31 +20,58 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
 1. **Containerize the App**:  
    - Build a Docker image:  
      ```bash
-     docker build -t gcr.io/final-project-443911/express-app .
+     docker build -t gcr.io/myfinal-project6-443911/express-app .
      ```
    - Push the image to Google Container Registry:  
      ```bash
-     docker push gcr.io/final-project-443911/express-app
+     docker push gcr.io/myfinal-project6-443911/express-app
      ```
 
-2. **Deploy to Google Cloud Run**:  
-   - Use Pulumi to deploy the application:  
+2. **Pulumi Setup for Deployment**:  
+   - **Install Pulumi CLI** (if not installed):  
+     [Download and install Pulumi](https://www.pulumi.com/docs/get-started/install/).
+
+   - **Login to Pulumi**:  
+     ```bash
+     pulumi login
+     ```
+
+   - **Initialize Pulumi Project**:  
+     If you have not already done so, run:  
+     ```bash
+     pulumi new typescript
+     ```
+
+   - **Configure Pulumi Stack**:  
+     Set your project and environment configuration:
+     ```bash
+     pulumi config set gcp:project myfinal-project6-443911
+     pulumi config set gcp:region us-central1
+     ```
+
+   - **Add Required Pulumi Code**:  
+     Replace the content of the `index.ts` file with the deployment script for:
+     - Google Cloud Run service
+     - Google Pub/Sub topic
+     - IAM roles and policies for Pub/Sub integration
+
+   - **Run Pulumi Up**:  
+     Deploy your app using:
      ```bash
      pulumi up
      ```
+     Confirm the changes in the preview and proceed.
+
+   - **Export the Cloud Run URL**:  
+     After deployment, Pulumi will output the Cloud Run service URL. Use it to access your deployed app.
 
 3. **Set Environment Variables**:  
-   Make sure all required environment variables are set during deployment. For example:
-   - `PORT`: Port for the Express app.
+   Ensure the following variables are properly configured in Pulumi or your runtime environment:
    - `DATABASE_URL`: Connection string for the backend database.
-   - `REDIS_URL` (if Redis is used): Redis instance connection string.
+   - `PORT`: Default is `8080`.
+   - `PUBSUB_TOPIC`: Google Pub/Sub topic for rate limit notifications.
 
-### 4. **Set Up Pulumi for Deployment**
-
-
-     Pulumi will deploy the app to **Google Cloud Run** and create the necessary resources (e.g., **Pub/Sub**, **IAM roles**).
-
-### 5. **Continuously deploy from a repository (source or function) in google cloud run**
+### 5. **Continuously deploy from a repository (source) in google cloud run**
 
   
    - **Secrets to add in GitHub**:
