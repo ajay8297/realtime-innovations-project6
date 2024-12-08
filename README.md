@@ -17,20 +17,30 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
 
 ## Deployment Instructions
 
-### 1. **Set Up Google Cloud**
+1. **Containerize the App**:  
+   - Build a Docker image:  
+     ```bash
+     docker build -t gcr.io/final-project-443911/express-app .
+     ```
+   - Push the image to Google Container Registry:  
+     ```bash
+     docker push gcr.io/final-project-443911/express-app
+     ```
 
-   - Create a project in Google Cloud.
-   - Enable **Cloud Run**, **Pub/Sub**, and **IAM API**.
+2. **Deploy to Google Cloud Run**:  
+   - Use Pulumi to deploy the application:  
+     ```bash
+     pulumi up
+     ```
 
-### 2. **Install Pulumi**
-
-### 3. **Containerize the Express App**
-
-
+3. **Set Environment Variables**:  
+   Make sure all required environment variables are set during deployment. For example:
+   - `PORT`: Port for the Express app.
+   - `DATABASE_URL`: Connection string for the backend database.
+   - `REDIS_URL` (if Redis is used): Redis instance connection string.
 
 ### 4. **Set Up Pulumi for Deployment**
 
-  
 
      Pulumi will deploy the app to **Google Cloud Run** and create the necessary resources (e.g., **Pub/Sub**, **IAM roles**).
 
