@@ -55,34 +55,34 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
 
 1. **Containerize the App**:  
    - Build a Docker image:  
-     ```bash
-     docker build -t gcr.io/myfinal-project6-443911/express-app .
-     ```
-   - Push the image to Google Container Registry:  
-     ```bash
+     
+     - docker build -t gcr.io/myfinal-project6-443911/express-app .
+
+  * Push the image to Google Container Registry:  *
+     
      docker push gcr.io/myfinal-project6-443911/express-app
-     ```
+     
 
 2. **Pulumi Setup for Deployment**:  
    - **Install Pulumi CLI**  
 
    - **Login to Pulumi**:  
-     ```bash
-     pulumi login
-     ```
+  
+    - pulumi login
+     
 
    - **Initialize Pulumi Project**:  
      If you have not already done so, run:  
-     ```bash
-     pulumi new typescript
-     ```
+   
+     - pulumi new typescript
+     
 
    - **Configure Pulumi Stack**:  
      Set your project and environment configuration:
-     ```bash
-     pulumi config set gcp:project myfinal-project6-443911
-     pulumi config set gcp:region us-central1
-     ```
+     
+    - pulumi config set gcp:project myfinal-project6-443911
+     - pulumi config set gcp:region us-central1
+    
 
    - **Add Required Pulumi Code**:  
      Replace the content of the `index.ts` file with the deployment script for:
@@ -92,9 +92,9 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
 
    - **Run Pulumi Up**:  
      Deploy your app using:
-     ```bash
+    
      pulumi up
-     ```
+  
      Confirm the changes in the preview and proceed.
 
    - **Export the Cloud Run URL**:  
