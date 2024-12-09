@@ -29,7 +29,7 @@ This project is an **Express.js** web application deployed on **Google Cloud Run
 | Language              | TypeScript                                                                 |
 | Infrastructure as Code| Pulumi (with Docker and GCP providers)                                      |
 | Containerization      | Docker,
-| Databases             |MongoDB                                               |                                 |
+| Databases             | Redis                                              |                                 |
 | CI/CD Pipelines       | GitHub Actions, Pulumi automation                                          |
 
 ## Prerequisites
